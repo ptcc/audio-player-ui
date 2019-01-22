@@ -1,25 +1,42 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+// @flow
+import React, { Component } from "react";
+import axios from "axios";
+import * as R from "ramda";
+import "./App.css";
+import SongCard from "./SongCard";
 
-class App extends Component {
+const getData = R.prop("data");
+const getSong = song => axios.get(song).then(getData);
+
+type Song = {
+  title: string,
+  artist: { name: string },
+  audio: string,
+};
+type State = { songs: Song[] };
+type Props = { apiAddress: string };
+
+class App extends Component<Props, State> {
+  state = {
+    songs: []
+  };
+
+  componentDidMount() {
+    const { apiAddress } = this.props;
+    axios
+      .get(`${apiAddress}/songs`)
+      .then(getData)
+      .then(songUrls => Promise.all(songUrls.map(getSong)))
+      .then(songs => this.setState({ songs }));
+  }
+
   render() {
+    const { songs } = this.state;
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        {songs.map(({ audio, title, artist }) => (
+          <SongCard key={audio} title={title} stream={audio} artist={artist} />
+        ))}
       </div>
     );
   }

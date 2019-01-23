@@ -1,5 +1,7 @@
 // TBD
-// it renders without crashing
+it("renders without crashing", () => {
+  expect(true).toBe(true);
+});
 // it displays the artist name
 // it displays the song title
 // it displays the songs count

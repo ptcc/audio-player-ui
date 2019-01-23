@@ -51,6 +51,7 @@ const SongCard = ({
         onClick={() => setExpanded(!expanded)}
         action={
           <IconButton
+            data-testid="Play/pause"
             aria-label="Play/pause"
             onClick={e => {
               setPlaying(!playing);

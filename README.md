@@ -1,4 +1,9 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+UI for song player API - created with CRA, added flow and redux on top.
+using Material-ui for song cards.
+
+## setup
+ - install yarn
+ - run `yarn install`
 
 ## Available Scripts
 

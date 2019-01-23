@@ -8,6 +8,8 @@ import {
   PAUSE,
   NOOP,
   SELECT_SONG,
+  NEXT,
+  PREVIOUS,
   type SongAction
 } from "./actions";
 
@@ -54,6 +56,22 @@ const handlers = {
     ...state,
     playing: true
   }),
+  [NEXT]: (state: State, action: SongAction) => {
+    const currentSongIndex = state.songs.findIndex(song=>song.audio===state.selectedSong);
+    const nextSong = state.songs[(currentSongIndex + 1) % state.songs.length ];
+    return {
+      ...state,
+      selectedSong: nextSong.audio      
+    };
+  },
+  [PREVIOUS]: (state: State, action: SongAction) => {
+    const currentSongIndex = state.songs.findIndex(song=>song.audio===state.selectedSong);
+    const nextSong = state.songs[(currentSongIndex - 1 + state.songs.length) % state.songs.length ];
+    return {
+      ...state,
+      selectedSong: nextSong.audio      
+    };
+  },
   [PAUSE]: (state: State, action: SongAction) => ({ ...state, playing: false })
 };
 

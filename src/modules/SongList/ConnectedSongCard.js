@@ -5,7 +5,7 @@ import SongCard from "../../Components/SongCard";
 const withPlayingState = connect(
     (state, props) => ({
       playing: state.selectedSong === props.audio && state.playing,
-      selected: state.selectedSong === props.audio
+      selected: state.selectedSong === props.audio,
     }),
     (dispatch, props) => ({
       setPlaying: playing =>

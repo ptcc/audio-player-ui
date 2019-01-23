@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -15,14 +15,32 @@ type Props = {
   classes: Object,
   title: string,
   artist: { name: string },
-  stream: string,
+  audio: string,
+  playing: boolean,
+  selected: boolean,
+  setPlaying: boolean => void
 };
 
-const SongCard = ({ classes = {}, title, artist, stream }: Props) => {
-  let audio;
+const SongCard = ({
+  classes = {},
+  title,
+  artist,
+  audio,
+  selected,
+  playing,
+  setPlaying
+}: Props) => {
+  let audioEl;
   const [duration, setDuration] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    if (!audioEl) return; 
+    if (playing) audioEl.play();
+    else {
+      audioEl.pause();
+      if (!selected) audioEl.currentTime = 0;
+    }
+  }, [playing, selected]);
 
   return (
     <Card className={classes.card}>
@@ -33,35 +51,35 @@ const SongCard = ({ classes = {}, title, artist, stream }: Props) => {
         onClick={() => setExpanded(!expanded)}
         action={
           <IconButton
-          aria-label="Play/pause"
-          onClick={e => {
-            if (!playing) audio && audio.play();
-            else audio && audio.pause();
-            setPlaying(!playing);
-            setDuration(audio && audio.duration);
-            e.stopPropagation();
-          }}
+            aria-label="Play/pause"
+            onClick={e => {
+              setPlaying(!playing);
+              setDuration(audioEl && audioEl.duration);
+              e.stopPropagation();
+            }}
           >
             {playing ? (
               <PauseIcon className={classes.playIcon} />
-              ) : (
-                <PlayArrowIcon className={classes.playIcon} />
-                )}
+            ) : (
+              <PlayArrowIcon className={classes.playIcon} />
+            )}
           </IconButton>
         }
       />
-      <Collapse in={expanded && Boolean(duration)} timeout="auto" unmountOnExit>
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>
-            {`${Math.round(duration / 60)}:${Math.round(duration % 60)}`}
+            {artist && `${artist.name} - `}
+            {`${title} - `}
+            {`${Math.round(duration / 60)}m${Math.round(duration % 60)}s`}
           </Typography>
         </CardContent>
       </Collapse>
       <div>
         <ReactAudioPlayer
-          src={stream}
+          src={audio}
           ref={element => {
-            audio = element && element.audioEl;
+            audioEl = element && element.audioEl;
           }}
         />
       </div>
@@ -74,16 +92,12 @@ const styles = theme => ({
     maxWidth: 800,
     margin: 20
   },
-  media: {
-    height: 0,
-    paddingTop: "56.25%" // 16:9
-  },
   actions: {
     display: "flex"
   },
   header: {
     cursor: "pointer"
-  },
+  }
 });
 
 export default withStyles(styles)(SongCard);
